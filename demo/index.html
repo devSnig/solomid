@@ -12,176 +12,621 @@
     <meta property="og:url" content="https://www.talater.com/annyang/"/>
     <meta property="og:site_name" content="annyang"/>
     <meta property="fb:admins" content="568390229"/>
-    <script src="annyang.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
-    <script>
-      "use strict";
-
-      // first we make sure annyang started succesfully
-      if (annyang) {
-
-        // define the functions our commands will run.
-        var hello = function () {
-          $("#hello").slideDown("slow");
-          speak();
-          scrollTo("#section_hello");
-        };
-
-        var showFlickr = function (tag) {
-          $('#flickrGallery').show();
-          $('#flickrLoader p').text('Searching for ' + tag).fadeIn('fast');
-          var url = '//api.flickr.com/services/rest/?method=flickr.photos.search&api_key=a828a6571bb4f0ff8890f7a386d61975&sort=interestingness-desc&per_page=9&format=json&callback=jsonFlickrApi&tags=' + tag;
-          $.ajax({
-            type: 'GET',
-            url: url,
-            async: false,
-            jsonpCallback: 'jsonFlickrApi',
-            contentType: "application/json",
-            dataType: 'jsonp'
-          });
-          scrollTo("#section_image_search");
-        };
-
-        var jsonFlickrApi = function (results) {
-          $('#flickrLoader p').fadeOut('slow');
-          var photos = results.photos.photo;
-          $.each(photos, function (index, photo) {
-            $(document.createElement("img"))
-              .attr({src: '//farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_s.jpg'})
-              .addClass("flickrGallery")
-              .appendTo(flickrGallery);
-          });
-        };
-
-        var showTPS = function (type) {
-          $('#tpsreport').show().animate({
-            bottom: '-100px'
-          }).delay('2000').animate({
-            bottom: '-500px'
-          });
-        };
-
-        var getStarted = function () {
-          window.location.href = 'https://github.com/TalAter/annyang';
-        };
-
-        // define our commands.
-        // * The key is the phrase you want your users to say.
-        // * The value is the action to do.
-        //   You can pass a function, a function name (as a string), or write your function as part of the commands object.
-        var commands = {
-          'hello (there)': hello,
-          'show me *search': showFlickr,
-          'show :type report': showTPS,
-          'let\'s get started': getStarted,
-        };
-
-        // OPTIONAL: activate debug mode for detailed logging in the console
-        annyang.debug();
-
-        // Add voice commands to respond to
-        annyang.addCommands(commands);
-
-        // OPTIONAL: Set a language for speech recognition (defaults to English)
-        // For a full list of language codes, see the documentation:
-        // https://github.com/TalAter/annyang/blob/master/docs/FAQ.md#what-languages-are-supported
-        annyang.setLanguage('en');
-
-        // Start listening. You can call this here, or attach this call to an event, button, etc.
-        annyang.start();
-      } else {
-        $(document).ready(function () {
-          $('#unsupported').fadeIn('fast');
-        });
-      }
-
-      var synth = window.speechSynthesis;
-
-      function speak() {
-
-        console.log(synth.getVoices())
-        const voices = synth.getVoices().sort(function (a, b) {
-          const aname = a.name.toUpperCase(), bname = b.name.toUpperCase();
-          if (aname < bname) return -1;
-          else if (aname == bname) return 0;
-          else return +1;
-        });
-        if (synth.speaking) {
-          console.error('speechSynthesis.speaking');
-          return;
-        }
-
-        var utterThis = new SpeechSynthesisUtterance('O kurwa! Ja pierdole twoja matka.');
-        utterThis.onend = function (event) {
-          console.log('SpeechSynthesisUtterance.onend');
-        };
-        utterThis.onerror = function (event) {
-          console.error('SpeechSynthesisUtterance.onerror');
-        };
-        var selectedOption = 'Google polski';
-        console.log(voices)
-        utterThis.voice = _.find(voices, (voice) => {return voice.name === selectedOption });
-        console.log(utterThis.voice)
-
-        // for (i = 0; i < voices.length; i++) {
-        //
-        //   if (voices[i].name === selectedOption) {
-        //     utterThis.voice = voices[i];
-        //     break;
-        //   }
-        // }
-        utterThis.pitch = 1;
-        utterThis.rate = 1;
-        synth.speak(utterThis);
-
-      }
 
 
-      var scrollTo = function (identifier, speed) {
-        $('html, body').animate({
-          scrollTop: $(identifier).offset().top
-        }, speed || 1000);
-      }
-    </script>
     <link rel="stylesheet" href="css/main.min.css"/>
 </head>
-<body>
-<section id="section_hello">
-    <p><em>Go ahead, try it&hellip;</em></p>
-    <p class="voice_instructions">Say "Hello!"</p>
-    <p id="hello" class="hidden">Hi dude!</p>
-</section>
-<section id="section_image_search">
-    <p><em>Let's try something more interesting&hellip;</em></p>
-    <p class="voice_instructions">Say "Show me cute kittens!"</p>
-    <p class="voice_instructions">Say "Show me Arches National Park!"</p>
-    <p class="voice_instructions">Now go wild. Say "Show me&hellip;" and make your demands!</p>
-    <div id="flickrLoader"><p></p></div>
-    <div id="flickrGallery" class="hidden"></div>
-</section>
-<section id="section_biz_use">
-    <p><em>That's cool, but in the real world it's not all kittens and hello world.</em></p>
-    <p class="voice_instructions">No problem, say "Show TPS report"</p>
-    <img src="images/tpscover.jpg" alt="" id="tpsreport" class="hidden">
-</section>
+<!--<body>-->
+<!--<section id="section_hello">-->
+<!--    <p><em>Go ahead, try it&hellip;</em></p>-->
+<!--    <p class="voice_instructions">Say "Hello!"</p>-->
+<!--    <p id="hello" class="hidden">Hi dude!</p>-->
+<!--</section>-->
+<!--<section id="section_image_search">-->
+<!--    <p><em>Let's try something more interesting&hellip;</em></p>-->
+<!--    <p class="voice_instructions">Say "Show me cute kittens!"</p>-->
+<!--    <p class="voice_instructions">Say "Show me Arches National Park!"</p>-->
+<!--    <p class="voice_instructions">Now go wild. Say "Show me&hellip;" and make your demands!</p>-->
+<!--    <div id="flickrLoader"><p></p></div>-->
+<!--    <div id="flickrGallery" class="hidden"></div>-->
+<!--</section>-->
+<!--<section id="section_biz_use">-->
+<!--    <p><em>That's cool, but in the real world it's not all kittens and hello world.</em></p>-->
+<!--    <p class="voice_instructions">No problem, say "Show TPS report"</p>-->
+<!--    <img src="images/tpscover.jpg" alt="" id="tpsreport" class="hidden">-->
+<!--</section>-->
 
-<script>
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-24775009-1']);
-  _gaq.push(['_trackPageview']);
-  (function () {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-  })();
-</script>
-<script src="./vendor/js/highlight.pack.js"></script>
-<script>
-  hljs.initHighlightingOnLoad();
-</script>
+<!--<script>-->
+<!--  var _gaq = _gaq || [];-->
+<!--  _gaq.push(['_setAccount', 'UA-24775009-1']);-->
+<!--  _gaq.push(['_trackPageview']);-->
+<!--  (function () {-->
+<!--    var ga = document.createElement('script');-->
+<!--    ga.type = 'text/javascript';-->
+<!--    ga.async = true;-->
+<!--    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'https://www') + '.google-analytics.com/ga.js';-->
+<!--    var s = document.getElementsByTagName('script')[0];-->
+<!--    s.parentNode.insertBefore(ga, s);-->
+<!--  })();-->
+<!--</script>-->
+<!--<script src="./vendor/js/highlight.pack.js"></script>-->
+<!--<script>-->
+<!--  hljs.initHighlightingOnLoad();-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" prefix="content: https://purl.org/rss/1.0/modules/content/  dc: https://purl.org/dc/terms/  foaf: https://xmlns.com/foaf/0.1/  og: https://ogp.me/ns#  rdfs: https://www.w3.org/2000/01/rdf-schema#  schema: https://schema.org/  sioc: https://rdfs.org/sioc/ns#  sioct: https://rdfs.org/sioc/types#  skos: https://www.w3.org/2004/02/skos/core#  xsd: https://www.w3.org/2001/XMLSchema# ">
+<head>
+  <meta charset="utf-8" />
+  <meta name="Generator" content="Drupal 8 (https://www.drupal.org)" />
+  <meta name="MobileOptimized" content="width" />
+  <meta name="HandheldFriendly" content="true" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="/sites/default/files/favicon.ico" type="image/vnd.microsoft.icon" />
+  <link rel="canonical" href="https://hackathon.org.ua/node/6" />
+  <link rel="shortlink" href="https://hackathon.org.ua/node/6" />
+  <link rel="revision" href="https://hackathon.org.ua/node/6" />
+
+  <title>Hackathon 2020 | Smile Hackathon</title>
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/ajax-progress.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/align.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/autocomplete-loading.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/fieldgroup.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/container-inline.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/clearfix.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/details.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/hidden.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/item-list.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/js.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/nowrap.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/position-container.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/progress.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/reset-appearance.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/resize.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/sticky-header.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/system-status-counter.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/system-status-report-counters.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/system-status-report-general-info.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/tabledrag.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/tablesort.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/core/themes/stable/css/system/components/tree-child.module.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/modules/contrib/paragraphs/css/paragraphs.unpublished.css?q5c6dy" />
+  <link rel="stylesheet" media="all" href="https://hackathon.org.ua/themes/custom/hack/css/hack.theme.css?q5c6dy" />
+
+  <script src="annyang.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+  <!--[if lte IE 8]>
+  <script src="https://hackathon.org.ua/core/assets/vendor/html5shiv/html5shiv.min.js?v=3.7.3"></script>
+  <![endif]-->
+  <script src="https://use.fontawesome.com/releases/v5.10.0/js/all.js" defer></script>
+  <script src="https://use.fontawesome.com/releases/v5.10.0/js/v4-shims.js" defer></script>
+  <style>
+    .type {
+      text-transform: capitalize;
+    }
+    .home__button form {
+      display: flex;
+      flex-flow: column;
+    }
+    .home__button form input {
+      height: 50px;
+      width: 50%;
+      margin: 0 auto 20px;
+      padding: 5px 10px;
+    }
+    .home__button form button {
+
+      width: 50%;
+      margin: 0 auto 20px;
+      background-color: #000000;
+      color: #ffffff;
+      border: 3px solid #000000;
+      padding: 22px 54px;
+      font-size: 22px;
+      border-radius: 20px;
+
+    }
+  </style>
+  <script>
+    "use strict";
+
+    // first we make sure annyang started succesfully
+    if (annyang) {
+
+      // define the functions our commands will run.
+      var hello = function () {
+        // $("#hello").slideDown("slow");
+        speak();
+        // scrollTo("#section_hello");
+      };
+
+      // var showFlickr = function (tag) {
+      //   $('#flickrGallery').show();
+      //   $('#flickrLoader p').text('Searching for ' + tag).fadeIn('fast');
+      //   var url = '//api.flickr.com/services/rest/?method=flickr.photos.search&api_key=a828a6571bb4f0ff8890f7a386d61975&sort=interestingness-desc&per_page=9&format=json&callback=jsonFlickrApi&tags=' + tag;
+      //   $.ajax({
+      //     type: 'GET',
+      //     url: url,
+      //     async: false,
+      //     jsonpCallback: 'jsonFlickrApi',
+      //     contentType: "application/json",
+      //     dataType: 'jsonp'
+      //   });
+      //   // scrollTo("#section_image_search");
+      // };
+      //
+      // var jsonFlickrApi = function (results) {
+      //   // $('#flickrLoader p').fadeOut('slow');
+      //   var photos = results.photos.photo;
+      //   $.each(photos, function (index, photo) {
+      //     $(document.createElement("img"))
+      //             .attr({src: '//farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_s.jpg'})
+      //             .addClass("flickrGallery")
+      //             .appendTo(flickrGallery);
+      //   });
+      // };
+
+      var showTPS = function (type) {
+        // $('#tpsreport').show().animate({
+        //   bottom: '-100px'
+        // }).delay('2000').animate({
+        //   bottom: '-500px'
+        // });
+      };
+
+      var getStarted = function () {
+
+      };
+      var register = () => {
+        speak('Without ads an sms, registration is free.');
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSe_cGlioJbECJ7BkDuf9jNhAA0iGkrZiYyMyJNVzWCfnsfZNg/alreadyresponded', '_blank');
+      };
+      var schedule = () => {
+        speak('tik, tak. tak, tak. SMILE hackathon');
+        scrollTo('#schedule');
+      };
+      var gotoLocation = () => {
+        speak('Here you go!');
+        scrollTo('#location');
+      };
+      var about = () => {
+        speak('You can check all information here!');
+        scrollTo('#about');
+      };
+      var setName = (pref, suff) => {
+        console.log(pref, suff)
+        jQuery('.type').val(suff);
+        // speak('You can check all information here!');
+        // scrollTo('#about');
+      };
+      var badwords = (pref, suff) => {
+        speak('Bad words, dude! stop to do it!');
+        // scrollTo('#about');
+      };
+      var nigga = (pref, suff) => {
+        speak('Are you nigga?!');
+        // scrollTo('#about');
+      };
+      var scroll = (pref, suff) => {
+        speak('Are you nigga?!');
+        scrollTo('body');
+      };
+
+      var setEmail = (pref, suff, suff2) => {
+        console.log(pref, suff);
+        jQuery('.mail').val(`${suff.replace(' ', '').trim()}@${suff2.trim().replace(' ', '')}`);
+        // speak('You can check all information here!');
+        // scrollTo('#about');
+      };
+      var porn = (pref, suff) => {
+        speak('Here you go little boy!');
+        window.open('https://pornhub.com', '_blank');
+        // scrollTo('#about');
+      };
+      var reload = (pref, suff) => {
+        window.location.reload();
+        // scrollTo('#about');
+      };
+      // define our commands.
+      // * The key is the phrase you want your users to say.
+      // * The value is the action to do.
+      //   You can pass a function, a function name (as a string), or write your function as part of the commands object.
+      var commands = {
+        'hello (there)': hello,
+        '(*prefix) about (*suffix)' : about,
+        '(*prefix) schedule (*suffix)' : schedule,
+        '(*prefix) location (*suffix)' : gotoLocation,
+        '(*prefix) register (*suffix)' : register,
+        '(*prefix) registration (*suffix)' : register,
+        'set (*prefix) name to (*suffix)' : setName,
+        'set (*prefix) email to (*suffix) at (*suffix2)' : setEmail,
+        '(*prefix) balaj (*suffix)' : badwords,
+        '(*prefix) bigot (*suffix)' : badwords,
+        '(*prefix) blood (*suffix)' : badwords,
+        '(*prefix) suka (*suffix)' : badwords,
+        '(*prefix) Luca (*suffix)' : badwords,
+        '(*prefix) bizjet (*suffix)' : badwords,
+        '(*prefix) fuck (*suffix)' : nigga,
+        '(*prefix) reload (*suffix)' : reload,
+        '(*prefix) Barcelona (*suffix)' : porn,
+        '(*prefix) boobs (*suffix)' : porn,
+        '(*prefix) scroll top (*suffix)' : scroll,
+      };
+
+      // OPTIONAL: activate debug mode for detailed logging in the console
+      annyang.debug();
+
+      // Add voice commands to respond to
+      annyang.addCommands(commands);
+
+      // OPTIONAL: Set a language for speech recognition (defaults to English)
+      // For a full list of language codes, see the documentation:
+      // https://github.com/TalAter/annyang/blob/master/docs/FAQ.md#what-languages-are-supported
+      annyang.setLanguage('en');
+
+      // Start listening. You can call this here, or attach this call to an event, button, etc.
+      annyang.start();
+    } else {
+      $(document).ready(function () {
+        $('#unsupported').fadeIn('fast');
+      });
+    }
+
+    var synth = window.speechSynthesis;
+
+    function speak(text = 'Hello, mother fucker!') {
+
+      console.log(synth.getVoices())
+      const voices = synth.getVoices().sort(function (a, b) {
+        const aname = a.name.toUpperCase(), bname = b.name.toUpperCase();
+        if (aname < bname) return -1;
+        else if (aname == bname) return 0;
+        else return +1;
+      });
+      if (synth.speaking) {
+        console.error('speechSynthesis.speaking');
+        return;
+      }
+
+      var utterThis = new SpeechSynthesisUtterance(text);
+      utterThis.onend = function (event) {
+        console.log('SpeechSynthesisUtterance.onend');
+      };
+      utterThis.onerror = function (event) {
+        console.error('SpeechSynthesisUtterance.onerror');
+      };
+      var selectedOption = 'Google english';
+      console.log(voices)
+      utterThis.voice = _.find(voices, (voice) => {return voice.name === selectedOption });
+      console.log(utterThis.voice);
+
+      // for (i = 0; i < voices.length; i++) {
+      //
+      //   if (voices[i].name === selectedOption) {
+      //     utterThis.voice = voices[i];
+      //     break;
+      //   }
+      // }
+      utterThis.pitch = 1;
+      utterThis.rate = 1;
+      synth.speak(utterThis);
+
+    }
+
+
+    var scrollTo = function (identifier, speed) {
+      $('html, body').animate({
+        scrollTop: $(identifier).offset().top
+      }, speed || 1000);
+    }
+  </script>
+
+</head>
+<body>
+<a href="#main-content" class="visually-hidden focusable">
+  Skip to main content
+</a>
+
+<div class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
+  <div class="layout-container">
+
+    <header role="banner">
+      <div>
+        <div data-drupal-messages-fallback class="hidden"></div>
+        <header class="header">
+          <div class="container">
+            <div class="header__top">
+              <div class="logo-wrapper">
+                <a href="#" class="logo">
+                  <img class="logo__without-menu" src="https://hackathon.org.ua/themes/custom/hack/images/logo-white.png" alt="Smile">
+                  <img class="logo__with-menu" src="https://hackathon.org.ua/themes/custom/hack/images/logo.png" alt="Smile">
+                </a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+      </div>
+
+    </header>
+
+
+
+
+
+
+
+
+
+
+    <main role="main">
+      <a id="main-content" tabindex="-1"></a>
+      <div class="layout-content">
+        <div>
+          <div id="block-hack-content">
+
+
+            <article role="article" about="/node/6">
+
+
+
+
+
+              <div>
+
+                <div id="head">
+                  <div>  <section class="home">
+                    <div class="home__left-bg">
+                      <div class="home__left-bg--top">
+                        <img class="home__image-bg hidden-mobile" src="/themes/custom/hack/images/home-left-top.png" alt="">
+                        <img class="home__image-bg hidden-desktop" src="/themes/custom/hack/images/home-left-top-m.png" alt="">
+                      </div>
+                      <div class="home__left-bg--middle">
+                        <img class="home__image-bg hidden-mobile" src="/themes/custom/hack/images/home-left-middle.png" alt="">
+                        <img class="home__image-bg hidden-desktop" src="/themes/custom/hack/images/home-left-middle-m.png" alt="">
+                      </div>
+                      <div class="home__left-bg--bottom">
+                        <img class="home__image-bg hidden-mobile" src="/themes/custom/hack/images/home-left-bottom.png" alt="">
+                        <img class="home__image-bg hidden-desktop" src="/themes/custom/hack/images/home-left-bottom-m.png" alt="">
+                      </div>
+                    </div>
+                    <div class="container">
+                      <div class="home__title-wrapper">
+                        <h1 class="home__title">Smile hackathon</h1>
+                        <div class="animated-icon animated-icon__zig">
+                          <img src="/themes/custom/hack/images/icons/zig.png" alt="">
+                        </div>
+                        <div class="animated-icon animated-icon__flash">
+                          <img src="/themes/custom/hack/images/icons/flash.png" alt="">
+                        </div>
+                        <div class="animated-icon animated-icon__figure">
+                          <img src="/themes/custom/hack/images/icons/figure.png" alt="">
+                        </div>
+                        <div class="animated-icon animated-icon__star--small star--center-left">
+                          <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                        </div>
+                        <div class="animated-icon animated-icon__star--small star--center-right">
+                          <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                        </div>
+                      </div>
+                      <div id="countdown" class="countdown" data-date="Feb 22" data-year="2020" data-time="09:00:00">
+                        <div class="countdown__item-wrapper">
+                          <div class="countdown__item">
+                            <span id="hours" class="time"></span>
+                            <span class="text">Години</span>
+                          </div>
+                        </div>
+                        <div class="countdown__item-wrapper">
+                          <div class="countdown__item">
+                            <span id="minutes"  class="time"></span>
+                            <span class="text">Хвилини</span>
+                          </div>
+                        </div>
+                        <div class="countdown__item-wrapper">
+                          <div class="countdown__item">
+                            <span id="seconds"  class="time"></span>
+                            <span class="text">Секунди</span>
+                          </div>
+                        </div>
+                        <div class="animated-icon animated-icon__circle animated-icon__circle--big"></div>
+                        <div class="animated-icon animated-icon__circle animated-icon__circle--small"></div>
+                      </div>
+                      <div class="home__button">
+<!--                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSe_cGlioJbECJ7BkDuf9jNhAA0iGkrZiYyMyJNVzWCfnsfZNg/viewform" class="button button&#45;&#45;black">Зареєструватися</a>-->
+                        <form action="#">
+                          <input type="text" class="type" required placeholder="First and Second name">
+                          <input type="email" class="mail" required placeholder="Mail is here">
+                          <button type="submit">Зареєструватись</button>
+                        </form>
+                      </div>
+                      <div class="home__event-info">
+                        <div class="date">22_02_2020</div>
+                        <div class="city"><span>Луцьк</span></div>
+                        <div class="street"><span>вул. Набережна 42</span></div>
+                        <div class="animated-icon animated-icon__lamp">
+                          <img src="/themes/custom/hack/images/icons/lamp.png" alt="">
+                        </div>
+                      </div>
+                      <div class="animated-icon animated-icon__eye">
+                        <img src="/themes/custom/hack/images/icons/eye.png" alt="">
+                      </div>
+                    </div>
+                    <div class="home__right-bg">
+                      <div class="home__right-bg--top">
+                        <img class="home__image-bg hidden-mobile" src="/themes/custom/hack/images/home-right-top.png" alt="">
+                        <img class="home__image-bg hidden-desktop" src="/themes/custom/hack/images/home-right-top-m.png" alt="">
+                      </div>
+                      <div class="home__right-bg--middle">
+                        <img class="home__image-bg hidden-mobile" src="/themes/custom/hack/images/home-right-middle.png" alt="">
+                        <img class="home__image-bg hidden-desktop" src="/themes/custom/hack/images/home-right-middle-m.png" alt="">
+                      </div>
+                      <div class="home__right-bg--bottom">
+                        <img class="home__image-bg hidden-mobile" src="/themes/custom/hack/images/home-right-bottom.png" alt="">
+                        <img class="home__image-bg hidden-desktop" src="/themes/custom/hack/images/home-right-bottom-m.png" alt="">
+                      </div>
+                    </div>
+                    <div class="animated-icon animated-icon__face">
+                      <img src="/themes/custom/hack/images/icons/face.png" alt="">
+                    </div>
+                    <div class="animated-icon animated-icon__star--big star--bottom-left">
+                      <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                    </div>
+                    <div class="animated-icon animated-icon__star--small star--top-left">
+                      <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                    </div>
+                    <div class="animated-icon animated-icon__star--small star--top-right">
+                      <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                    </div>
+                    <div class="animated-icon animated-icon__star--small star--top-bottom-left">
+                      <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                    </div>
+                    <div class="animated-icon animated-icon__star--small star--bottom-right">
+                      <img src="/themes/custom/hack/images/icons/star.png" alt="">
+                    </div>
+                  </section>
+                  </div>
+                  <div >  <div class="paragraph paragraph--type--main-event-section paragraph--view-mode--default">
+                    <section class="event" id="schedule">
+                      <div class="container">
+                        <h2 class="event__title animated-block">SMILE HACKATHON</h2>
+                        <div class="event__text animated-block">
+                          <p>Новий формат змагань для ІТ-спеціалістів в Луцьку. Дебютний захід такого формату не матиме конкретної теми. Усім учасникам пропонується представити будь-яку свою ідею чи рішення без обмежень у виборі технологій.</p>
+                        </div>
+                        <div class="event__program animated-block delay-400">
+                          <h3 class="event__program-title">Розклад</h3>
+                          <ul class="event__program-list">
+                            <li><span class="number">09:30</span> Реєстрація</li>
+                            <li><span class="number">10:30</span> Відкриття заходу</li>
+                            <li><span class="number">11:00</span> Обговорення ідей та старт роботи</li>
+                            <li><span class="number">13:00</span> Обід!</li>
+                            <li><span class="number">14:00</span> Робота над розробкою проектів</li>
+                            <li><span class="number">18:00</span> Презентації проектів</li>
+                            <li><span class="number">19:00</span> Визначення переможців</li>
+                            <li><span class="number">19:30</span> Нагородження переможців</li>
+                            <li><span class="number">20:00</span> AfterParty!</li>
+                          </ul>
+                        </div>
+                        <div class="event__photo-wrapper animated-block delay-300">
+                          <div class="event__photo">
+                            <img src="/themes/custom/hack/images/drupal-photo.jpg" alt="">
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                  </div>
+                  <div >  <div class="paragraph paragraph--type--motivation paragraph--view-mode--default">
+                    <section class="why" id="about">
+                      <div class="why__left-side animated-block">
+                        <h3>Для кого ця подія?</h3>
+                        <div class="why__yellow">
+                          <p>У тебе є ідея чи проект, а для втілення потрібно трохи більше натхнення і однодумців</p>
+                          <span>Тобі сюди!</span>
+                        </div>
+                        <p>Твій проект може бути побудований на будь-яких платформах та фреймворках – це може бути мобільний додаток, програма, скрипт, веб-додаток, нейронна мережа, тощо.</p>
+                        <h3 class="list-title">Умови участі</h3>
+                        <ul class="list--ballets">
+                          <li>обов’язкова попередня реєстрація</li>
+                          <li>наявність персональної техніки для роботи (ноутбук, телефон, тощо)</li>
+                          <li>гарний настрій</li>
+                        </ul>
+                      </div>
+                      <div class="why__right-side animated-block delay-400">
+                        <h3>Що ви отримаєте?</h3>
+                        <ul class="list--icons">
+                          <li class="lamp">можливість реалізувати свої власні ідеї та отримати підтримку серед однодумців</li>
+                          <li class="smile">комфортне та сучасне місце для роботи</li>
+                          <li class="coffee">можливість самостійно розпоряджатися відведеним часом</li>
+                          <li class="target">смачний обід, та безлімітний доступ до чаю та кави</li>
+                          <li class="smile">Вечірка для святкування успішної реалізації ідеї та старту чогось нового</li>
+                        </ul>
+                      </div>
+                    </section>
+                  </div>
+                  </div>
+                  <div >  <div class="paragraph paragraph--type--contacts paragraph--view-mode--default">
+                    <footer>
+                      <div class="footer__top" id="location">
+                        <div class="contacts">
+                          <div class="contacts__item contacts__item--full">
+                            <h4>АДРЕСА:</h4>
+                            <p>вул. Набережна 42, м. Луцьк</p>
+                          </div>
+                          <div class="contacts__item">
+                            <h4>ТЕЛЕФОН:</h4>
+                            <p>+ 38 (066) 740-25-60</p>
+                          </div>
+                          <div class="contacts__item">
+                            <h4>E-MAIL:</h4>
+                            <p>hakaton@smile.fr</p>
+                          </div>
+                          <div class="contacts__item contacts__item--full contacts__item--text">
+                            <p></p>
+                          </div>
+                          <div class="contacts__item contacts__item--full">
+                            <h4></h4>
+                            <ul class="socials">
+                              <li class="icon icon--instagram"><a href="https://www.instagram.com/smile.hackathon/"><i class="fab fa-instagram"></i></a></li>
+                              <li class="icon icon--facebook"><a href="https://www.facebook.com/Smile-Ukraine-168176643231243/"><i class="fab fa-facebook-f"></i></a></li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div id="map" class="map">
+                          <div class="map__custom">
+                            <a class="marker-link" target="_blank" href="https://goo.gl/maps/pxVXVgGbX6FfNpiE9"><div class="marker"></div></a>
+                          </div>
+                        </div>
+                      </div>
+                    </footer>
+                  </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </main>
+
+    <footer role="contentinfo">
+      <div>
+        <footer>
+          <div class="footer__bottom">
+            <div class="container">
+              <p>Copyright &copy; 2019 Smile. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+
+    </footer>
+
+  </div>
+</div>
+
+
+<script type="application/json" data-drupal-selector="drupal-settings-json">{"path":{"baseUrl":"\/","scriptPath":null,"pathPrefix":"","currentPath":"node\/6","currentPathIsAdmin":false,"isFront":true,"currentLanguage":"en","currentQuery":{"fbclid":"IwAR0976JRxBaxgeNarcX-hAcQwL5wJJG8U86aQ5JvrFnTiTGAAJOl8o7fUYY"}},"pluralDelimiter":"\u0003","latitude":50.753839,"longitude":25.324091,"user":{"uid":0,"permissionsHash":"32d936e50f31028ea8b09549ac225cc0cc249d72ba9c17a472ae3a5540d91e82"}}</script>
+<script src="https://hackathon.org.ua/core/assets/vendor/domready/ready.min.js?v=1.0.8"></script>
+<script src="https://hackathon.org.ua/core/assets/vendor/jquery/jquery.min.js?v=3.2.1"></script>
+<script src="https://hackathon.org.ua/core/assets/vendor/jquery/jquery-extend-3.4.0.js?v=3.2.1"></script>
+<script src="https://hackathon.org.ua/core/assets/vendor/jquery-once/jquery.once.min.js?v=2.2.0"></script>
+<script src="https://hackathon.org.ua/core/misc/drupalSettingsLoader.js?v=8.7.8"></script>
+<script src="https://hackathon.org.ua/core/misc/drupal.js?v=8.7.8"></script>
+<script src="https://hackathon.org.ua/core/misc/drupal.init.js?v=8.7.8"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAe0No_GbwHBaRfY_b3bQraYjSbAfO26EQ"></script>
+<script src="https://hackathon.org.ua/themes/custom/hack/js/main.js?v=8.7.8"></script>
+<script src="https://hackathon.org.ua/themes/custom/hack/js/owl.carousel.min.js?v=8.7.8"></script>
+
 </body>
 </html>
